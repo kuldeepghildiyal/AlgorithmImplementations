@@ -205,5 +205,134 @@ namespace AlgorithmsImplementation
             return 5 - key % 5;
         }
     }
+
+    class OpenHashTableManager
+    {
+        class Node
+        {
+            int key;
+            string value;
+            Node next;
+            public Node(int key, string value)
+            {
+                this.key = key;
+                this.value = value;
+                next = null;
+            }
+            public int GetKey => key;
+            public string GetValue => value;
+            public void SetNextNode(Node obj)
+            {
+                next = obj;
+            }
+            public Node GetNextNode()
+            {
+                return this.next;
+            }
+        }
+
+        Node[] list;
+        readonly int size = 10;
+
+        public OpenHashTableManager(int maxSize)
+        {
+            list = new Node[size];
+            for (int i = 0; i < size; i++)
+            {
+                list[i] = null;
+            }
+            this.size = maxSize;
+        }
+        public void Add(int key, string data)
+        {
+            Node nObj = new Node(key, data);
+            int hash = key % size;
+            while (list[hash] != null && list[hash].GetKey % size != key % size)
+            {
+                hash = (hash + 1) % size;
+            }
+            if (list[hash] != null && hash == list[hash].GetKey % size)
+            {
+                nObj.SetNextNode(list[hash].GetNextNode());
+                list[hash].SetNextNode(nObj);
+                return;
+            }
+            else
+            {
+                list[hash] = nObj;
+                return;
+            }
+        }
+        public string Get(int key)
+        {
+            int hash = key % size;
+            while (list[hash] != null && list[hash].GetKey % size != key % size)
+            {
+                hash = (hash + 1) % size;
+            }
+            Node current = list[hash];
+            while (current.GetKey != key && current.GetNextNode() != null)
+            {
+                current = current.GetNextNode();
+            }
+            if (current.GetKey == key)
+            {
+                return current.GetValue;
+            }
+            else
+            {
+                return "Not found!";
+            }
+        }
+        public void Remove(int key)
+        {
+            int hash = key % size;
+            while (list[hash] != null && list[hash].GetKey % size != key % size)
+            {
+                hash = (hash + 1) % size;
+            }
+            //a current node pointer used for traversal, currently points to the head
+            Node current = list[hash];
+            bool isRemoved = false;
+            while (current != null)
+            {
+                if (current.GetKey == key)
+                {
+                    list[hash] = current.GetNextNode();
+                    Console.WriteLine("Data removed successfully!");
+                    isRemoved = true;
+                    break;
+                }
+
+                if (current.GetNextNode() != null)
+                {
+                    if (current.GetNextNode().GetKey == key)
+                    {
+                        Node newNext = current.GetNextNode().GetNextNode();
+                        current.SetNextNode(newNext);
+                        Console.WriteLine("Data removed successfully!");
+                        isRemoved = true;
+                        break;
+                    }
+                    else
+                    {
+                        current = current.GetNextNode();
+                    }
+                }
+
+            }
+
+            if (!isRemoved)
+            {
+                Console.WriteLine("Not found to delete!");
+                return;
+            }
+        }
+
+
+    }
+
+
+
 }
 
